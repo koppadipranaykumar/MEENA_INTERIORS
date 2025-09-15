@@ -270,7 +270,7 @@ const Home = () => {
   return (
     <div ref={containerRef} className="w-full min-h-screen overflow-x-hidden">
       {/* Hero Section with Parallax Video */}
-      <div className="relative w-full h-screen mt-16 sm:mt-20 overflow-hidden">
+      <div className="relative w-full h-screen mt-20 sm:mt-20 overflow-hidden">
         <motion.div 
           className="absolute inset-0 w-full h-full"
           style={{ y, scale }}
