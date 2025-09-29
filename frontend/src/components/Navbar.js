@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import logo from "../assets/logo.png";
 
@@ -7,12 +7,30 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize useNavigate
   const { scrollY } = useScroll();
   
   // Smooth background opacity based on scroll
   const backgroundOpacity = useTransform(scrollY, [0, 100], [0, 0.95]);
   const backdropBlur = useTransform(scrollY, [0, 100], [0, 20]);
 
+  // Function to scroll the window to the top
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handler for logo/brand click
+  const handleLogoClick = () => {
+    if (location.pathname !== "/") {
+      // If not on home, navigate to home (which triggers scroll-to-top via Home.js useEffect)
+      navigate("/");
+    } else {
+      // If already on home, just scroll to top of the window
+      scrollToTop();
+    }
+    setIsMobileMenuOpen(false);
+  };
+  
   // Monitor scroll position
   useEffect(() => {
     const handleScroll = () => {
@@ -24,26 +42,22 @@ const Navbar = () => {
   }, []);
 
   // Handle contact button click
-  const handleContactClick = (e) => {
-    e.preventDefault();
+  // Handle contact button click
+// Inside Navbar.js
+
+// Handler for the general Contact link/button
+const handleContactClick = (e) => {
+    e.preventDefault(); // Prevent default link behavior
     
-    // If we're already on home page, scroll to contact section
-    if (location.pathname === "/") {
-      const contactElement = document.getElementById("contact-section");
-      if (contactElement) {
-        contactElement.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    } else {
-      // If we're on a different page, navigate to home with hash
-      window.location.href = "/#contact-section";
-    }
-    
-    // Close mobile menu if open
+    // Close the mobile menu if open
     setIsMobileMenuOpen(false);
-  };
+
+    // If we are currently on the Home page, navigate to '/contact'.
+    // The Contact.js component (which we assume you will update) 
+    // will now handle opening the modal immediately.
+    // This provides a consistent action across all pages.
+    navigate("/contact"); 
+};
 
   // Animation variants
   const navVariants = {
@@ -174,8 +188,8 @@ const Navbar = () => {
       />
 
       <div className="relative flex items-center justify-between py-4 px-6 md:px-8">
-        {/* Logo Section */}
-        <Link to="/" className="flex items-center space-x-3 group">
+        {/* Logo Section - Modified to use handleLogoClick */}
+        <Link to="/" onClick={handleLogoClick} className="flex items-center space-x-3 group">
           <motion.div
             variants={logoVariants}
             initial="initial"
@@ -262,6 +276,7 @@ const Navbar = () => {
               ) : (
                 <Link
                   to={item.path}
+                  onClick={item.path === "/" ? handleLogoClick : () => setIsMobileMenuOpen(false)} // Added click handler for Home link
                   className={`relative px-4 py-2 text-lg font-semibold transition-all duration-300 ${
                     location.pathname === item.path
                       ? "text-red-700"
@@ -362,7 +377,7 @@ const Navbar = () => {
                           ? "text-red-700 bg-red-50"
                           : "text-gray-800 hover:text-red-700 hover:bg-gray-50"
                       }`}
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={item.path === "/" ? handleLogoClick : () => setIsMobileMenuOpen(false)} // Added click handler for Home link
                     >
                       <motion.span
                         whileHover={{ x: 10 }}

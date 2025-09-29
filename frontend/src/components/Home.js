@@ -7,6 +7,8 @@ import afterImage from "../assets/after-image.PNG";
 import founderImage from '../assets/founder.PNG';
 import ConsultationModal from "./ConsultationModal"; 
 
+// --- Animation Variants ---
+
 const fadeUp = {
   hidden: { opacity: 0, y: 60, scale: 0.9 },
   visible: { 
@@ -52,7 +54,6 @@ const floatingAnimation = {
   }
 };
 
-// New animation variants for the interior design section
 const scaleIn = {
   hidden: { opacity: 0, scale: 0.8, rotateX: -20 },
   visible: { 
@@ -73,21 +74,99 @@ const slideInUp = {
   }
 };
 
+// --- Footer Component ---
+
+const Footer = () => {
+    const year = new Date().getFullYear();
+    
+    const handleFooterLinkClick = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    return (
+        <footer className="bg-gray-800 text-white pt-12 pb-4 px-4 sm:px-6 lg:px-20">
+            <div className="max-w-7xl mx-auto border-b border-gray-700 pb-10 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
+                {/* Contact Us */}
+                <div className="space-y-4 col-span-2 sm:col-span-1">
+                    <h3 className="text-lg font-bold text-red-600 uppercase tracking-wider">Contact Us</h3>
+                    <div className="space-y-2 text-sm text-gray-400">
+                        <a href="tel:+91989915677" className="flex items-center hover:text-red-400 transition-colors">
+                            <span className="mr-2">📞</span>+91 98991 5677 / +91 95334 64777
+                        </a>
+                        <a href="tel:+919849915677" className="flex items-center hover:text-red-400 transition-colors">
+                            <span className="mr-2">📱</span>+91 98499 15677
+                        </a>
+                        <a href="mailto:koppadisuribabu@gmail.com" className="flex items-center hover:text-red-400 transition-colors">
+                            <span className="mr-2">📧</span>koppadisuribabu@gmail.com
+                        </a>
+                        <div className="flex items-start">
+                            <span className="mr-2 mt-1">📍</span>
+                            <p>
+                                Bolarum, Railway Employees Colony,
+                                <br />
+                                Secunderabad, Telangana - 500010
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Links */}
+                <div className="space-y-4 col-span-2 sm:col-span-1">
+                    <h3 className="text-lg font-bold text-red-600 uppercase tracking-wider">Links</h3>
+                    <nav className="space-y-2 text-sm text-gray-400 flex flex-col">
+                        <Link to="/" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Home</Link>
+                        <Link to="/services" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Services</Link>
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Projects</Link>
+                        <Link to="/contact" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Contact</Link>
+                    </nav>
+                </div>
+
+                {/* Products/Services (Our Focus) */}
+                <div className="space-y-4 col-span-2 md:col-span-1">
+                    <h3 className="text-lg font-bold text-red-600 uppercase tracking-wider">Our Focus</h3>
+                    <nav className="space-y-2 text-sm text-gray-400 flex flex-col">
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Modular Kitchens</Link>
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Designer Doors</Link>
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Living Halls</Link>
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">False Ceilings</Link>
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">TV Units</Link>
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Wardrobes</Link>
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Shoe Box</Link>
+                        <Link to="/explore-work" onClick={handleFooterLinkClick} className="hover:text-red-400 transition-colors">Pooja Unit</Link>
+                    </nav>
+                </div>
+
+                
+            </div>
+
+            {/* Copyright Section */}
+            <div className="max-w-7xl mx-auto pt-4 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
+                <p>&copy; {year} Meena Interiors. All rights reserved.</p>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2 sm:mt-0 items-center">
+                    <span className="hover:text-gray-300 transition-colors cursor-default">Privacy Policy</span>
+                    <span className="hover:text-gray-300 transition-colors cursor-default">Terms And Conditions</span>
+                    <span className="text-gray-500 hover:text-gray-300 transition-colors mt-2 sm:mt-0 cursor-default">Made with ❤️ by K Pranay Kumar</span>
+                </div>
+            </div>
+        </footer>
+    );
+};
+// --- Home Component ---
+
 const Home = () => {
   const containerRef = useRef(null);
-  const contactRef = useRef(null); // Ref for the contact section
+  const contactRef = useRef(null);
   const location = useLocation();
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const navigate = useNavigate(); 
   
-  // New state to manage modal visibility
   const [showModal, setShowModal] = useState(false);
 
+  // Scroll hooks for parallax effect
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
   });
 
-  // Smooth spring animations for scroll-based effects
   const y = useSpring(useTransform(scrollYProgress, [0, 1], ["0%", "50%"]), {
     stiffness: 100,
     damping: 30,
@@ -128,68 +207,60 @@ const Home = () => {
     };
   }, []);
 
-  // Effect to scroll to the contact section when the URL hash matches
+  // --- Scroll Logic Functions ---
+
+  // Function to scroll to the very top of the window
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  // Effect to handle scrolling on route change/hash change (for general links)
   useEffect(() => {
+    // Scroll to the top on new page load or path change, unless a hash is present.
+    if (!location.hash) {
+      scrollToTop();
+    }
+    
+    // Logic for scrolling to the contact section when the URL hash matches
     if (location.hash === "#contact-section" && contactRef.current) {
       contactRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [location]);
+  }, [location.pathname, location.hash]);
 
-  // Function to handle navigation for the "Learn More" buttons
+  // --- Handlers ---
+
   const handleLearnMoreClick = () => {
     navigate("/services");
+    scrollToTop(); 
   };
 
-  // Modified function to open the modal
   const handleConsultationClick = () => {
     setShowModal(true);
   };
   
-  // Function to close the modal
   const handleCloseModal = () => {
     setShowModal(false);
   };
 
-  // Before/After Image Slider Component
+  // --- BeforeAfterSlider Component (Nested) ---
+
   const BeforeAfterSlider = () => {
     const [sliderPosition, setSliderPosition] = useState(50);
     const [isDragging, setIsDragging] = useState(false);
     const containerRef = useRef(null);
 
-    const handleMouseDown = () => {
-      setIsDragging(true);
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    const handleTouchStart = () => {
-      setIsDragging(true);
-    };
-
-    const handleTouchEnd = () => {
-      setIsDragging(false);
-    };
+    const handleMouseDown = () => { setIsDragging(true); };
+    const handleMouseUp = () => { setIsDragging(false); };
+    const handleTouchStart = () => { setIsDragging(true); };
+    const handleTouchEnd = () => { setIsDragging(false); };
 
     useEffect(() => {
-      const handleMouseMove = (e) => {
+      const handleMove = (e) => {
         if (!isDragging || !containerRef.current) return;
-  
-        const rect = containerRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const percentage = (x / rect.width) * 100;
         
-        if (percentage >= 0 && percentage <= 100) {
-          setSliderPosition(percentage);
-        }
-      };
-  
-      const handleTouchMove = (e) => {
-        if (!isDragging || !containerRef.current) return;
-  
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const rect = containerRef.current.getBoundingClientRect();
-        const x = e.touches[0].clientX - rect.left;
+        const x = clientX - rect.left;
         const percentage = (x / rect.width) * 100;
         
         if (percentage >= 0 && percentage <= 100) {
@@ -198,16 +269,16 @@ const Home = () => {
       };
 
       if (isDragging) {
-        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mousemove', handleMove);
         document.addEventListener('mouseup', handleMouseUp);
-        document.addEventListener('touchmove', handleTouchMove);
+        document.addEventListener('touchmove', handleMove);
         document.addEventListener('touchend', handleTouchEnd);
       }
 
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mousemove', handleMove);
         document.removeEventListener('mouseup', handleMouseUp);
-        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchmove', handleMove);
         document.removeEventListener('touchend', handleTouchEnd);
       };
     }, [isDragging]);
@@ -218,13 +289,12 @@ const Home = () => {
         className="relative w-full h-full cursor-col-resize touch-pan-x"
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Before Image (Background) */}
         <div 
           className="absolute inset-0 w-full h-full bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${beforeImage})`
-          }}
+          style={{ backgroundImage: `url(${beforeImage})` }}
         />
 
         {/* After Image (Foreground with clip-path) */}
@@ -267,8 +337,11 @@ const Home = () => {
     );
   };
 
+  // --- JSX Render ---
+
   return (
     <div ref={containerRef} className="w-full min-h-screen overflow-x-hidden">
+      
       {/* Hero Section with Parallax Video */}
       <div className="relative w-full h-screen mt-20 sm:mt-20 overflow-hidden">
         <motion.div 
@@ -285,7 +358,6 @@ const Home = () => {
             <source src={sampleVideo} type="video/mp4" />
           </video>
           
-          {/* Animated Overlay Gradient */}
           <motion.div 
             className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50"
             initial={{ opacity: 0 }}
@@ -299,21 +371,7 @@ const Home = () => {
           className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4 sm:px-6 z-10"
           style={{ opacity }}
         >
-          {/* Animated Background Elements */}
-          <motion.div
-            className="absolute top-20 left-4 sm:left-10 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full blur-xl"
-            {...floatingAnimation}
-          />
-          <motion.div
-            className="absolute bottom-32 right-8 sm:right-16 w-24 h-24 sm:w-32 sm:h-32 bg-white/5 rounded-full blur-2xl"
-            animate={{
-              y: [20, -20, 20],
-              x: [-10, 10, -10],
-              transition: { duration: 8, repeat: Infinity, ease: "easeInOut" }
-            }}
-          />
-
-          {/* Main Title with Typing Effect */}
+          {/* Main Title with Typing Effect - LOGO/TITLE CLICK HANDLER */}
           <motion.div
             initial={{ opacity: 0, scale: 0.5, rotateX: -90 }}
             animate={{ opacity: 1, scale: 1, rotateX: 0 }}
@@ -322,7 +380,8 @@ const Home = () => {
               ease: "backOut",
               delay: 0.5
             }}
-            className="relative"
+            className="relative cursor-pointer"
+            onClick={scrollToTop} 
           >
             <h1 className="text-3xl sm:text-5xl md:text-7xl leading-tight">
               <span className="text-gray-900">
@@ -359,7 +418,7 @@ const Home = () => {
           </motion.p>
 
           {/* Call to Action Button */}
-          <Link to="/explore-work">
+          <Link to="/explore-work" onClick={scrollToTop}>
             <motion.button
               className="px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-r from-red-800 to-red-900 rounded-full font-semibold text-base sm:text-lg shadow-2xl hover:shadow-red-800/25 border border-white/20 backdrop-blur-sm text-white"
               initial={{ opacity: 0, scale: 0.8, y: 50 }}
@@ -398,7 +457,7 @@ const Home = () => {
         </motion.div>
       </div>
 
-      {/* NEW: Interior Design Services Section */}
+      {/* Interior Design Services Section */}
       <motion.div
         className="w-full py-16 sm:py-20 lg:py-24 px-4 sm:px-8 lg:px-20 relative overflow-hidden"
         style={{ backgroundColor: "#fefbf6" }}
@@ -673,7 +732,8 @@ const Home = () => {
             </p>
           </motion.div>
         </div>
-      </div>   
+      </div>   
+      
       {/* Statistics Section */}
       <motion.div
         className="w-full py-20 px-8 md:px-20 relative overflow-hidden bg-gray-100"
@@ -761,6 +821,9 @@ const Home = () => {
       
       {/* Render the modal component here */}
       <ConsultationModal isVisible={showModal} onClose={handleCloseModal} />
+
+      {/* RENDER THE FOOTER */}
+      <Footer />
     </div>
   );
 };
