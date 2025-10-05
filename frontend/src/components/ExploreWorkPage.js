@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { motion, AnimatePresence } from "framer-motion"; // Import AnimatePresence for exit animations
+import { Link } from "react-router-dom";
 import founderImage from '../assets/founder.PNG';
 
 // A helper function to dynamically import all images from a directory
@@ -133,6 +133,18 @@ const ExploreWorkPage = () => {
         window.scrollTo(0, 0);
     }, []); 
 
+    // FIX: Use useEffect to disable/enable body scrolling when the modal opens/closes
+    useEffect(() => {
+        if (selectedCategory) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [selectedCategory]); 
 
     // Initial ID counter to ensure unique IDs for all images across categories
     let nextImageId = 1;
@@ -231,49 +243,131 @@ const ExploreWorkPage = () => {
     ];
 
     const ImageModal = ({ category, onClose }) => {
+        const [selectedImageInModal, setSelectedImageInModal] = useState(null); // New state for full-screen image
+
+        const currentIndex = selectedImageInModal 
+            ? category.images.findIndex(img => img.id === selectedImageInModal.id) 
+            : -1;
+
+        const goToNextImage = () => {
+            const nextIndex = (currentIndex + 1) % category.images.length;
+            setSelectedImageInModal(category.images[nextIndex]);
+        };
+
+        const goToPrevImage = () => {
+            const prevIndex = (currentIndex - 1 + category.images.length) % category.images.length;
+            setSelectedImageInModal(category.images[prevIndex]);
+        };
+
         return (
             <motion.div
                 className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={onClose}
+                onClick={() => { // Click outside closes modal if not on full image
+                    if (!selectedImageInModal) {
+                        onClose();
+                    } else {
+                        // If full image is open, click outside takes it back to grid
+                        setSelectedImageInModal(null);
+                    }
+                }}
             >
-                <motion.div
-                    className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">
-                            {category.icon} {category.title}
-                        </h2>
-                        <button
-                            onClick={onClose}
-                            className="text-gray-500 hover:text-gray-700 text-2xl"
+                <AnimatePresence>
+                    {selectedImageInModal ? (
+                        // Full-screen image view
+                        <motion.div
+                            key="fullscreen-image"
+                            className="relative bg-white rounded-lg p-4 sm:p-6 max-w-5xl w-full h-[90vh] flex flex-col items-center justify-center"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()} // Prevent closing on image click
+                            onWheel={(e) => e.stopPropagation()}
                         >
-                            ×
-                        </button>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {category.images.map((image) => (
-                            <div
-                                key={image.id}
-                                className="relative rounded-lg overflow-hidden border-2 border-gray-300 bg-gray-200"
-                            >
-                                <img 
-                                    src={image.imageUrl} 
-                                    alt={image.title} 
-                                    className="w-full h-full object-contain" 
-                                    onError={(e) => { e.target.src = 'https://placehold.co/400x300/E55757/white?text=Image+Not+Found' }}
-                                />
+                            <div className="absolute top-4 right-4 flex space-x-2 z-10">
+                                <button
+                                    onClick={() => setSelectedImageInModal(null)}
+                                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold hover:bg-gray-300 transition-colors"
+                                >
+                                    All Images
+                                </button>
+                                <button
+                                    onClick={onClose}
+                                    className="text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                                >
+                                    ×
+                                </button>
                             </div>
-                        ))}
-                    </div>
-                </motion.div>
+
+                            <div className="flex items-center justify-center w-full h-full relative">
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); goToPrevImage(); }} 
+                                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-800 bg-opacity-50 text-white p-2 rounded-full text-2xl z-10 hover:bg-opacity-75 transition-opacity"
+                                >
+                                    &lt;
+                                </button>
+                                <img
+                                    src={selectedImageInModal.imageUrl}
+                                    alt={selectedImageInModal.title}
+                                    className="max-w-full max-h-full object-contain rounded-lg shadow-md"
+                                    onError={(e) => { e.target.src = 'https://placehold.co/800x600/E55757/white?text=Image+Not+Found' }}
+                                />
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); goToNextImage(); }} 
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-800 bg-opacity-50 text-white p-2 rounded-full text-2xl z-10 hover:bg-opacity-75 transition-opacity"
+                                >
+                                    &gt;
+                                </button>
+                            </div>
+                            <div className="absolute bottom-4 text-gray-700 font-semibold text-lg">
+                                {currentIndex + 1} / {category.images.length}
+                            </div>
+                        </motion.div>
+                    ) : (
+                        // Grid of images view
+                        <motion.div
+                            key="image-grid"
+                            className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            onWheel={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-2xl font-bold text-gray-800">
+                                    {category.icon} {category.title}
+                                </h2>
+                                <button
+                                    onClick={onClose}
+                                    className="text-gray-500 hover:text-gray-700 text-2xl"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {category.images.map((image) => (
+                                    <motion.div
+                                        key={image.id}
+                                        className="relative rounded-lg overflow-hidden border-2 border-gray-300 bg-gray-200 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                                        whileHover={{ scale: 1.02 }}
+                                        onClick={() => setSelectedImageInModal(image)} // Set image for full-screen view
+                                    >
+                                        <img 
+                                            src={image.imageUrl} 
+                                            alt={image.title} 
+                                            className="w-full h-full object-contain" 
+                                            onError={(e) => { e.target.src = 'https://placehold.co/400x300/E55757/white?text=Image+Not+Found' }}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </motion.div>
         );
     };
@@ -479,12 +573,14 @@ const ExploreWorkPage = () => {
             </div>
 
             {/* Image Modal */}
-            {selectedCategory && (
-                <ImageModal
-                    category={selectedCategory}
-                    onClose={() => setSelectedCategory(null)}
-                />
-            )}
+            <AnimatePresence> {/* Wrap ImageModal with AnimatePresence for exit animations */}
+                {selectedCategory && (
+                    <ImageModal
+                        category={selectedCategory}
+                        onClose={() => setSelectedCategory(null)}
+                    />
+                )}
+            </AnimatePresence>
             
             {/* FOOTER INTEGRATION */}
             <Footer />
