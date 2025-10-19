@@ -1,26 +1,14 @@
-import React from 'react';
-import { Helmet } from 'react-helmet';
+import React, { useEffect } from 'react';
 
-// --- SCHEMA DATA ---
-// NOTE: We are using "logo3.PNG" which was confirmed to be in your public/ folder.
-// Ensure this filename and capitalization is exact on your server.
-
+// NOTE: Ensure your existing BUSINESS_DATA object is imported or defined here.
 const BUSINESS_DATA = {
     "@context": "https://schema.org",
-    "@type": "HomeAndConstructionBusiness", // Appropriate category for Interior Design
-    
-    // Core Business Identity
+    "@type": "HomeAndConstructionBusiness",
     "name": "Meena Interiors",
-    "url": "https://www.meenainteriors.com/", 
-    
-    // Corrected Logo URL - Using the file found in your public/ folder
-    "image": "https://www.meenainteriors.com/logo192.PNG", 
-    
-    // Contact Information (Extracted from Home.js Footer)
+    "url": "https://www.meenainteriors.com/",          
+    "image": "https://www.meenainteriors.com/logo3.PNG", 
     "telephone": "+91 984991 5677", 
     "email": "koppadisuribabu@gmail.com",
-    
-    // Physical Location (Extracted from Home.js Footer)
     "address": {
         "@type": "PostalAddress",
         "streetAddress": "Bolarum, Railway Employees Colony",
@@ -29,35 +17,40 @@ const BUSINESS_DATA = {
         "postalCode": "500010",
         "addressCountry": "IN"
     },
-    
-    // Aggregate Rating (Crucial for Rich Snippets)
-    // IMPORTANT: These values MUST be visible on your website's homepage.
     "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "4.8", // Replace with your actual average rating
+        "ratingValue": "4.8", 
         "bestRating": "5.0",
-        "ratingCount": "150"  // Replace with your actual total review count
+        "ratingCount": "150"  
     },
-    
-    // Proprietor/Founder for better SEO Entity recognition
     "founder": {
         "@type": "Person",
         "name": "Mr. KOPPADI SURI BABU",
         "jobTitle": "Founder & Chief Designer"
     }
-    // You may also add a 'description' property here if you have a short description.
 };
 
-const LocalBusinessSchema = () => (
-    <Helmet>
-        {/* This method uses JSON.stringify() and dangerouslySetInnerHTML to correctly 
-            inject the unescaped JSON data into the document head, making it crawlable by Google.
-        */}
-        <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(BUSINESS_DATA) }}
-        />
-    </Helmet>
-);
+const LocalBusinessSchema = () => {
+    useEffect(() => {
+        // 1. Create the <script> element
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        
+        // 2. Insert the stringified JSON data
+        // This uses innerHTML directly on the script tag, which is guaranteed to work.
+        script.innerHTML = JSON.stringify(BUSINESS_DATA);
+        
+        // 3. Append the script to the <head>
+        document.head.appendChild(script);
+
+        // Cleanup function: remove the script tag when the component unmounts
+        return () => {
+            document.head.removeChild(script);
+        };
+    }, []); // Empty dependency array ensures this runs once on mount
+
+    // This component renders nothing visible
+    return null; 
+};
 
 export default LocalBusinessSchema;
