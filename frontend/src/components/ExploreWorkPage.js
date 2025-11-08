@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Import AnimatePresence for exit animations
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import founderImage from '../assets/founder.PNG';
+// NOTE: You must ensure ConsultationModal is available and correctly imported.
+// Assuming it is located at './ConsultationModal' like in your Home.js example
+import ConsultationModal from './ConsultationModal'; 
+
 
 // A helper function to dynamically import all images from a directory
 const importAll = (r) => {
@@ -24,7 +28,7 @@ const barRoomImages = importAll(require.context('../assets/barroom', false, /\.(
 const sinkAreaImages = importAll(require.context('../assets/washarea', false, /\.(PNG)$/));
 
 
-// --- Footer Component (Copied for integration) ---
+// --- Footer Component ---
 
 const Footer = () => {
     const year = new Date().getFullYear();
@@ -127,7 +131,17 @@ const Footer = () => {
 
 const ExploreWorkPage = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [showModal, setShowModal] = useState(false); // 1. ADD STATE FOR CONSULTATION MODAL
+    
+    // Handlers for the consultation modal
+    const handleConsultationClick = () => {
+        setShowModal(true);
+    };
 
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
+    
     // useEffect to scroll to the top of the page when the component mounts
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -135,7 +149,8 @@ const ExploreWorkPage = () => {
 
     // FIX: Use useEffect to disable/enable body scrolling when the modal opens/closes
     useEffect(() => {
-        if (selectedCategory) {
+        // Updated logic to lock scroll for BOTH image modal AND consultation modal
+        if (selectedCategory || showModal) { 
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
@@ -144,7 +159,7 @@ const ExploreWorkPage = () => {
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, [selectedCategory]); 
+    }, [selectedCategory, showModal]); // Dependency array updated
 
     // Initial ID counter to ensure unique IDs for all images across categories
     let nextImageId = 1;
@@ -539,7 +554,7 @@ const ExploreWorkPage = () => {
                 </div>
             </div>
 
-            {/* Contact Section */}
+            {/* Contact Section (MODIFIED TO USE MODAL HANDLER) */}
             <div className="bg-red-900 py-16 px-6 text-center">
                 <motion.h2
                     className="text-3xl font-bold text-white mb-4"
@@ -559,7 +574,10 @@ const ExploreWorkPage = () => {
                 >
                     Contact us today for a free consultation and let's bring your dream space to life.
                 </motion.p>
+                
+                {/* 2. BUTTON USES onClick HANDLER TO OPEN MODAL */}
                 <motion.button
+                    onClick={handleConsultationClick}
                     className="bg-white text-red-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
@@ -573,12 +591,19 @@ const ExploreWorkPage = () => {
             </div>
 
             {/* Image Modal */}
-            <AnimatePresence> {/* Wrap ImageModal with AnimatePresence for exit animations */}
+            <AnimatePresence>
                 {selectedCategory && (
                     <ImageModal
                         category={selectedCategory}
                         onClose={() => setSelectedCategory(null)}
                     />
+                )}
+            </AnimatePresence>
+            
+            {/* 3. RENDER THE CONSULTATION MODAL */}
+            <AnimatePresence>
+                {showModal && (
+                    <ConsultationModal isVisible={showModal} onClose={handleCloseModal} />
                 )}
             </AnimatePresence>
             

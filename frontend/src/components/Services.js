@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import ConsultationModal from "./ConsultationModal";
+import ConsultationModal from "./ConsultationModal"; // Import the modal component
 
-// --- Footer Component ---
-
+// --- Footer Component (Copied for brevity) ---
 const Footer = () => {
     const year = new Date().getFullYear();
     
@@ -104,14 +103,38 @@ const Footer = () => {
 // --- Services Component ---
 
 const Services = () => {
+    // New state to manage modal visibility
+    const [showModal, setShowModal] = useState(false);
+
     // useEffect to scroll to the top of the page when the component mounts
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, []); // The empty dependency array ensures this effect runs only once
+    }, []);
+
+    // Effect to disable body scroll when the modal is open
+    useEffect(() => {
+        if (showModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showModal]); // Dependency on showModal
 
     const [activeTab, setActiveTab] = useState('services');
-    // New state to manage modal visibility
-    const [showModal, setShowModal] = useState(false);
+    
+    // New function to open the modal
+    const handleConsultationClick = () => {
+        setShowModal(true);
+    };
+    
+    // Function to close the modal
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
 
 
     // New list of specific project types with "Estimation"
@@ -209,21 +232,11 @@ const Services = () => {
                 "Once the quotation is made and approved their will not be any changes ",
                 "Any additional scope in work will be charged extra",
                 "Any damage caused due to rough usage after handover will not come under our responsibility",
-                "3 days prior information has to be given to start the site"        
+                "3 days prior information has to be given to start the site"        
             ]
         }
     ];
     
-    // New function to open the modal
-    const handleConsultationClick = () => {
-        setShowModal(true);
-    };
-    
-    // Function to close the modal
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
-
     return (
         <div className="min-h-screen pt-20">
             {/* Back to Home Button */}
@@ -355,7 +368,6 @@ const Services = () => {
                                                         <th className="text-left py-3 px-4 font-semibold">Material</th>
                                                         <th className="text-left py-3 px-4 font-semibold">Grade</th>
                                                         <th className="text-left py-3 px-4 font-semibold">Specification</th>
-                                                        {/* This table was missing a column header for the last td content, removing it for cleaner structure */}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -366,8 +378,6 @@ const Services = () => {
                                                             <td className="py-3 px-4 text-gray-600">
                                                                 {item.thickness || item.brand || 'Standard'}
                                                             </td>
-                                                            {/* Removed the extra td here to align with three headers */}
-                                                            {/* <td className="py-3 px-4 text-green-600 font-semibold">{item.warranty}</td> */}
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -430,11 +440,11 @@ const Services = () => {
                         transition={{ duration: 0.8 }}
                         viewport={{ once: true }}
                     >
-                    </motion.h2>  
+                    </motion.h2> 
                 </div>
             </div>
 
-            {/* Contact Section */}
+            {/* Contact Section (MODIFIED) */}
             <div className="bg-red-900 py-16 px-6 text-center">
                 <motion.h2
                     className="text-3xl font-bold text-white mb-4"
@@ -455,7 +465,7 @@ const Services = () => {
                     Contact us today for a detailed quotation and free consultation. All measurements and design consultations are complimentary.
                 </motion.p>
                 <motion.button
-                    onClick={handleConsultationClick}
+                    onClick={handleConsultationClick} // Use handler to open modal
                     className="bg-white text-red-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
