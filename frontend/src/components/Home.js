@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import sampleVideo from "../assets/bgvideo.mp4";
 import founderImage from '../assets/founder.PNG';
 import ConsultationModal from "./ConsultationModal"; 
+import { FaWhatsapp } from "react-icons/fa";
 
 
 import LocalBusinessSchema from './LocalBusinessSchema'; 
@@ -93,8 +94,13 @@ const Footer = () => {
                         <a href="tel:+919849915677" className="flex items-center hover:text-red-400 transition-colors">
                             <span className="mr-2">📞</span>+91 984991 5677 / +91 95334 64777
                         </a>
-                        <a href="tel:+919849915677" className="flex items-center hover:text-red-400 transition-colors">
-                            <span className="mr-2">📱</span>+91 98499 15677
+                        <a href="https://wa.me/919849915677"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center hover:text-green-500 transition-colors"
+                        >
+                            <FaWhatsapp className="mr-2 text-xl" />
+                                +91 98499 15677
                         </a>
                         <a href="mailto:koppadisuribabu@gmail.com" className="flex items-center hover:text-red-400 transition-colors">
                             <span className="mr-2">📧</span>koppadisuribabu@gmail.com
