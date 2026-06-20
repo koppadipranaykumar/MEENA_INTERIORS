@@ -1,9 +1,7 @@
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
 import React, { useRef, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import sampleVideo from "../assets/bgvideo.mp4";
-import beforeImage from "../assets/before-image.PNG";
-import afterImage from "../assets/after-image.PNG";
 import founderImage from '../assets/founder.PNG';
 import ConsultationModal from "./ConsultationModal"; 
 
@@ -163,6 +161,43 @@ const Home = () => {
     
     const [showModal, setShowModal] = useState(false);
 
+    // Client testimonials carousel
+    const testimonials = [
+        {
+            name: "Ramesh & Lakshmi",
+            locality: "Bolarum, Secunderabad",
+            quote: "Our kitchen feels twice the size now. The team kept us updated at every step and finished right on schedule.",
+            rating: 5
+        },
+        {
+            name: "Anitha Reddy",
+            locality: "Trimulgherry, Secunderabad",
+            quote: "We were nervous about the budget, but the free estimate was spot on with no surprises later. Genuinely honest work.",
+            rating: 5
+        },
+        {
+            name: "Prashanth Rao",
+            locality: "Alwal, Hyderabad",
+            quote: "Mr. Suri Babu personally checked on our wardrobe fittings twice. That kind of attention is rare these days.",
+            rating: 5
+        },
+        {
+            name: "Sowmya & Karthik",
+            locality: "Bowenpally, Secunderabad",
+            quote: "From the false ceiling to the TV unit, every corner of our hall feels intentional. Friends keep asking who designed it.",
+            rating: 4
+        }
+    ];
+
+    const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, []);
+
     // Scroll hooks for parallax effect
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -242,101 +277,6 @@ const Home = () => {
     
     const handleCloseModal = () => {
         setShowModal(false);
-    };
-
-    // --- BeforeAfterSlider Component (Nested) ---
-
-    const BeforeAfterSlider = () => {
-        const [sliderPosition, setSliderPosition] = useState(50);
-        const [isDragging, setIsDragging] = useState(false);
-        const containerRef = useRef(null);
-
-        const handleMouseDown = () => { setIsDragging(true); };
-        const handleMouseUp = () => { setIsDragging(false); };
-        const handleTouchStart = () => { setIsDragging(true); };
-        const handleTouchEnd = () => { setIsDragging(false); };
-
-        useEffect(() => {
-            const handleMove = (e) => {
-                if (!isDragging || !containerRef.current) return;
-                
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const rect = containerRef.current.getBoundingClientRect();
-                const x = clientX - rect.left;
-                const percentage = (x / rect.width) * 100;
-                
-                if (percentage >= 0 && percentage <= 100) {
-                    setSliderPosition(percentage);
-                }
-            };
-
-            if (isDragging) {
-                document.addEventListener('mousemove', handleMove);
-                document.addEventListener('mouseup', handleMouseUp);
-                document.addEventListener('touchmove', handleMove);
-                document.addEventListener('touchend', handleTouchEnd);
-            }
-
-            return () => {
-                document.removeEventListener('mousemove', handleMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-                document.removeEventListener('touchmove', handleMove);
-                document.removeEventListener('touchend', handleTouchEnd);
-            };
-        }, [isDragging]);
-
-        return (
-            <div 
-                ref={containerRef}
-                className="relative w-full h-full cursor-col-resize touch-pan-x"
-                onMouseDown={handleMouseDown}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-            >
-                {/* Before Image (Background) */}
-                <div 
-                    className="absolute inset-0 w-full h-full bg-cover bg-center"
-                    style={{ backgroundImage: `url(${beforeImage})` }}
-                />
-
-                {/* After Image (Foreground with clip-path) */}
-                <div 
-                    className="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-100 ease-out"
-                    style={{
-                        backgroundImage: `url(${afterImage})`,
-                        clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)`
-                    }}
-                />
-
-                {/* Slider Handle */}
-                <div 
-                    className="absolute top-0 h-full flex items-center justify-center z-10"
-                    style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
-                >
-                    <motion.div
-                        className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-2xl border-4 border-red-900 flex items-center justify-center cursor-col-resize"
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.9 }}
-                        animate={{ 
-                            boxShadow: isDragging 
-                                ? "0 0 30px rgba(185, 28, 28, 0.5)" 
-                                : "0 10px 25px rgba(0, 0, 0, 0.2)"
-                        }}
-                    >
-                        <div className="flex space-x-1">
-                            <div className="w-1 h-4 sm:h-6 bg-red-900 rounded-full"></div>
-                            <div className="w-1 h-4 sm:h-6 bg-red-900 rounded-full"></div>
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* Vertical Line */}
-                <div 
-                    className="absolute top-0 h-full w-0.5 bg-white shadow-lg"
-                    style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
-                />
-            </div>
-        );
     };
 
     // --- JSX Render ---
@@ -506,7 +446,7 @@ const Home = () => {
                             whileHover={{ scale: 1.05 }}
                             transition={{ type: "spring", stiffness: 300 }}
                         >
-                            Transform Your Space
+                            Same Walls. New Story.
                             <motion.div
                                 className="absolute -bottom-2 sm:-bottom-3 left-0 h-1 sm:h-1.5 bg-gradient-to-r from-red-900 to-red-700 rounded-full"
                                 initial={{ width: 0 }}
@@ -522,36 +462,63 @@ const Home = () => {
                         </motion.p>
                     </motion.div>
 
-                    {/* Before/After Image Slider */}
+                    {/* Client Testimonials Carousel */}
                     <motion.div
                         className="mb-12 sm:mb-16 lg:mb-20"
                         variants={fadeUp}
                     >
-                        <motion.div
-                            className="bg-white rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-gray-100 max-w-4xl mx-auto"
-                            whileHover={{ scale: 1.02 }}
-                            transition={{ type: "spring", stiffness: 100 }}
-                        >
-                            <h3 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6 sm:mb-8">
-                                See The Transformation
+                        <div className="max-w-3xl mx-auto text-center">
+                            <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-3">
+                                Real Homes, Real Reviews
                             </h3>
-                            
-                            <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden bg-gray-200">
-                                <BeforeAfterSlider />
+                            <p className="text-sm sm:text-base text-gray-500 mb-8 sm:mb-10">
+                                A few words from families we've worked with around Secunderabad
+                            </p>
+
+                            <div className="relative min-h-[15rem] sm:min-h-[12rem] flex items-center justify-center">
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={activeTestimonial}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.5, ease: "easeOut" }}
+                                        className="absolute inset-0 flex flex-col items-center justify-center px-2 sm:px-8"
+                                    >
+                                        <div className="flex space-x-1 mb-4">
+                                            {Array.from({ length: testimonials[activeTestimonial].rating }).map((_, i) => (
+                                                <span key={i} className="text-red-900 text-lg">★</span>
+                                            ))}
+                                            {Array.from({ length: 5 - testimonials[activeTestimonial].rating }).map((_, i) => (
+                                                <span key={`empty-${i}`} className="text-gray-300 text-lg">★</span>
+                                            ))}
+                                        </div>
+                                        <p className="text-lg sm:text-xl text-gray-700 font-light italic leading-relaxed mb-6">
+                                            "{testimonials[activeTestimonial].quote}"
+                                        </p>
+                                        <p className="text-sm sm:text-base font-semibold text-gray-800">
+                                            {testimonials[activeTestimonial].name}
+                                        </p>
+                                        <p className="text-xs sm:text-sm text-gray-500">
+                                            {testimonials[activeTestimonial].locality}
+                                        </p>
+                                    </motion.div>
+                                </AnimatePresence>
                             </div>
-                            
-                            <div className="flex justify-center items-center mt-4 sm:mt-6 space-x-6 sm:space-x-8 text-gray-600">
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gray-400 rounded-full"></div>
-                                    <span className="font-medium text-sm sm:text-base">Before</span>
-                                </div>
-                                
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-red-900 rounded-full"></div>
-                                    <span className="font-medium text-sm sm:text-base">After</span>
-                                </div>
+
+                            <div className="flex justify-center space-x-2 mt-6 sm:mt-8">
+                                {testimonials.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setActiveTestimonial(index)}
+                                        className={`h-2 rounded-full transition-all duration-300 ${
+                                            index === activeTestimonial ? 'w-6 bg-red-900' : 'w-2 bg-gray-300'
+                                        }`}
+                                        aria-label={`Show testimonial ${index + 1}`}
+                                    />
+                                ))}
                             </div>
-                        </motion.div>
+                        </div>
                     </motion.div>
 
                     {/* Services Grid */}
@@ -753,7 +720,7 @@ const Home = () => {
                         </p>
                     </motion.div>
                 </div>
-            </div>   
+            </div>   
             
             {/* Statistics Section */}
             <motion.div
